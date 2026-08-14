@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Powered Civic Issue Reporting and Resolution Platform</title>
+  <meta name="description" content="A next-generation municipal platform for AI-powered civic issue reporting, automated department routing, and citizen resolution tracking.">
+  
+  <!-- Modern Typography from Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top App Navigation -->
+  <header class="app-header">
+    <div class="container nav-container">
+      <a href="#" class="brand-wrapper" onclick="App.switchTab('report'); return false;">
+        <div class="brand-icon">🏛️</div>
+        <div class="brand-text">
+          <h1>CivicReport AI</h1>
+          <span>Municipal Issue & Resolution Portal</span>
+        </div>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li>
+            <button class="nav-tab-btn active" data-tab="report" id="tab-btn-report">
+              <span>✍️</span> Report Issue
+            </button>
+          </li>
+          <li>
+            <button class="nav-tab-btn" data-tab="tracker" id="tab-btn-tracker">
+              <span>📋</span> Issues Explorer
+            </button>
+          </li>
+          <li>
+            <button class="nav-tab-btn" data-tab="departments" id="tab-btn-departments">
+              <span>🏢</span> Departments
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <button class="btn btn-secondary" onclick="App.switchTab('tracker')">
+          <span>🔍</span> Track ID
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero & Metrics Header -->
+  <section class="hero-banner">
+    <div class="container">
+      <div class="hero-grid">
+        <div>
+          <h2 class="hero-title">Report, Track & Resolve Civic Issues</h2>
+          <p class="hero-subtitle">
+            Empowering citizens and municipal departments with intelligent reporting, automated categorization, and end-to-end resolution tracking.
+          </p>
+        </div>
+        <div class="hero-quick-search">
+          <input type="text" id="quick-search-input" placeholder="Enter Tracking ID (e.g. CIVIC-...)">
+          <button class="btn btn-primary" id="btn-quick-search">Search</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Container -->
+  <main class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem;">
+    
+    <!-- Stats Row -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-blue">📊</div>
+        <div class="stat-info">
+          <div class="stat-number" id="stat-total">0</div>
+          <div class="stat-label">Total Reported Issues</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-purple">🤖</div>
+        <div class="stat-info">
+          <div class="stat-number" id="stat-ai">0</div>
+          <div class="stat-label">AI Classified & Routed</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-yellow">⚙️</div>
+        <div class="stat-info">
+          <div class="stat-number" id="stat-progress">0</div>
+          <div class="stat-label">In Active Progress</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-green">✅</div>
+        <div class="stat-info">
+          <div class="stat-number" id="stat-resolved">0</div>
+          <div class="stat-label">Successfully Resolved</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANE 1: CITIZEN REPORTING FORM -->
+    <section id="pane-report" class="tab-pane active">
+      <div class="report-layout">
+        
+        <!-- Left: Reporting Form -->
+        <div class="card">
+          <div class="card-header">
+            <h3>New Civic Complaint Submission</h3>
+            <span class="badge badge-REPORTED">Citizen Portal</span>
+          </div>
+          <div class="card-body">
+            <form id="issue-form">
+              
+              <div class="form-group">
+                <label for="issue-title">Issue Headline / Title *</label>
+                <input type="text" id="issue-title" class="form-control" placeholder="e.g. Deep Pothole on 5th Crossroad near Hospital" required minlength="5" maxlength="200">
+              </div>
+
+              <div class="form-group">
+                <label for="issue-description">Detailed Description *</label>
+                <textarea id="issue-description" class="form-control" placeholder="Describe the hazard, size, surrounding landmarks, or risks to vehicles and pedestrians..." required minlength="10" maxlength="3000"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label>Select Category (Optional - AI classification will verify)</label>
+                <div class="category-selector-grid">
+                  <div>
+                    <input type="radio" name="category" value="ROADS" id="cat-roads" class="category-radio-input" checked>
+                    <label for="cat-roads" class="category-radio-label">
+                      <span>🛣️</span> Roads
+                    </label>
+                  </div>
+                  <div>
+                    <input type="radio" name="category" value="ELECTRICITY" id="cat-elec" class="category-radio-input">
+                    <label for="cat-elec" class="category-radio-label">
+                      <span>⚡</span> Electricity
+                    </label>
+                  </div>
+                  <div>
+                    <input type="radio" name="category" value="GARBAGE_SANITATION" id="cat-san" class="category-radio-input">
+                    <label for="cat-san" class="category-radio-label">
+                      <span>🗑️</span> Garbage
+                    </label>
+                  </div>
+                  <div>
+                    <input type="radio" name="category" value="WATER" id="cat-water" class="category-radio-input">
+                    <label for="cat-water" class="category-radio-label">
+                      <span>🚰</span> Water
+                    </label>
+                  </div>
+                  <div>
+                    <input type="radio" name="category" value="DRAINAGE" id="cat-drain" class="category-radio-input">
+                    <label for="cat-drain" class="category-radio-label">
+                      <span>🌊</span> Drainage
+                    </label>
+                  </div>
+                  <div>
+                    <input type="radio" name="category" value="OTHER" id="cat-other" class="category-radio-input">
+                    <label for="cat-other" class="category-radio-label">
+                      <span>📌</span> Other
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="issue-address">Location / Street Address</label>
+                <input type="text" id="issue-address" class="form-control" placeholder="e.g. 742 Evergreen Terrace, Sector 4">
+              </div>
+
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="issue-lat">Latitude</label>
+                  <input type="number" step="any" id="issue-lat" class="form-control" placeholder="e.g. 37.7749">
+                </div>
+                <div class="form-group">
+                  <label for="issue-lng">Longitude</label>
+                  <input type="number" step="any" id="issue-lng" class="form-control" placeholder="e.g. -122.4194">
+                </div>
+              </div>
+
+              <div style="margin-bottom: 1.25rem;">
+                <button type="button" class="btn btn-secondary" id="btn-get-location" style="width: 100%;">
+                  📍 Capture Current GPS Location
+                </button>
+              </div>
+
+              <div style="border-top: 1px solid var(--color-border); padding-top: 1.25rem; margin-top: 1.25rem;">
+                <h4 style="font-size: 0.9rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--color-text-main);">Reporter Contact Details</h4>
+                <div class="form-row-2">
+                  <div class="form-group">
+                    <label for="citizen-name">Your Full Name</label>
+                    <input type="text" id="citizen-name" class="form-control" placeholder="Jane Doe">
+                  </div>
+                  <div class="form-group">
+                    <label for="citizen-email">Email Address</label>
+                    <input type="email" id="citizen-email" class="form-control" placeholder="jane@example.com">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="citizen-phone">Phone Number</label>
+                  <input type="tel" id="citizen-phone" class="form-control" placeholder="+1-555-0199">
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary" id="btn-submit-issue" style="width: 100%; padding: 0.85rem; font-size: 1rem;">
+                Submit Civic Report
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Right: How it Works & Guidelines -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+          <div class="card">
+            <div class="card-header">
+              <h3>🤖 AI-Powered Workflow</h3>
+            </div>
+            <div class="card-body">
+              <div class="info-callout">
+                <strong>Automated Vision Pipeline:</strong> When photos are attached, the Python FastAPI AI service categorizes severity and routes the ticket directly to the corresponding department.
+              </div>
+              <ul style="padding-left: 1.25rem; font-size: 0.875rem; color: var(--color-text-secondary); display: flex; flex-direction: column; gap: 0.6rem;">
+                <li><strong>1. Citizen Reports:</strong> Ticket is assigned an instant unique tracking ID.</li>
+                <li><strong>2. AI Classification:</strong> Deep learning model classifies road, water, electricity, or sanitation hazards.</li>
+                <li><strong>3. Department Routing:</strong> Auto-dispatched to the respective municipal division.</li>
+                <li><strong>4. Field Resolution:</strong> On-site officers update repair status with public resolution logs.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3>🏛️ Active Jurisdictions</h3>
+            </div>
+            <div class="card-body" style="font-size: 0.875rem; color: var(--color-text-secondary);">
+              <p>Municipal departments actively connected to this portal:</p>
+              <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem;">
+                <span class="badge" style="background:#f1f5f9; color:#1e293b; border:1px solid #cbd5e1;">Roads & Pavements</span>
+                <span class="badge" style="background:#f1f5f9; color:#1e293b; border:1px solid #cbd5e1;">Electricity & Power</span>
+                <span class="badge" style="background:#f1f5f9; color:#1e293b; border:1px solid #cbd5e1;">Sanitation & Waste</span>
+                <span class="badge" style="background:#f1f5f9; color:#1e293b; border:1px solid #cbd5e1;">Water Supply</span>
+                <span class="badge" style="background:#f1f5f9; color:#1e293b; border:1px solid #cbd5e1;">Drainage & Sewage</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- PANE 2: ISSUES EXPLORER & TRACKER -->
+    <section id="pane-tracker" class="tab-pane">
+      <div class="toolbar-bar">
+        <div class="filter-group">
+          <input type="text" id="filter-search" class="form-control" placeholder="Search by title, code, location..." style="width: 260px;">
+          
+          <select id="filter-status" class="filter-select">
+            <option value="">All Statuses</option>
+            <option value="REPORTED">Reported</option>
+            <option value="AI_CLASSIFIED">AI Classified</option>
+            <option value="ASSIGNED">Assigned</option>
+            <option value="IN_PROGRESS">In Progress</option>
+            <option value="RESOLVED">Resolved</option>
+            <option value="REJECTED">Rejected</option>
+          </select>
+
+          <select id="filter-category" class="filter-select">
+            <option value="">All Categories</option>
+            <option value="ROADS">Roads</option>
+            <option value="ELECTRICITY">Electricity</option>
+            <option value="GARBAGE_SANITATION">Garbage / Sanitation</option>
+            <option value="WATER">Water</option>
+            <option value="DRAINAGE">Drainage</option>
+            <option value="OTHER">Other</option>
+          </select>
+
+          <select id="filter-department" class="filter-select">
+            <option value="">All Departments</option>
+          </select>
+        </div>
+
+        <button class="btn btn-secondary" onclick="App.loadIssues()">
+          🔄 Refresh
+        </button>
+      </div>
+
+      <!-- Issues List Grid -->
+      <div id="issues-grid" class="issues-grid">
+        <!-- Rendered via JavaScript -->
+      </div>
+    </section>
+
+    <!-- PANE 3: DEPARTMENTS DIRECTORY -->
+    <section id="pane-departments" class="tab-pane">
+      <div style="margin-bottom: 1.5rem;">
+        <h2 style="font-family: var(--font-heading); font-size: 1.4rem;">Municipal Department Directory</h2>
+        <p style="font-size: 0.9rem; color: var(--color-text-secondary);">Municipal divisions managing civic maintenance, public works, and complaint resolution.</p>
+      </div>
+
+      <div id="departments-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.25rem;">
+        <!-- Rendered via JavaScript -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ISSUE DETAILS & TIMELINE MODAL DRAWER -->
+  <div id="issue-modal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.35rem;">
+            <span id="modal-tracking-no" class="tracking-code" style="font-size: 0.9rem;"></span>
+            <span id="modal-status-badge" class="badge"></span>
+          </div>
+          <h3 id="modal-title" style="font-family: var(--font-heading); font-size: 1.25rem; color: var(--color-text-main);"></h3>
+        </div>
+        <button id="modal-close" class="modal-close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        
+        <!-- Description -->
+        <p id="modal-desc" style="font-size: 0.95rem; color: var(--color-text-secondary); line-height: 1.6; margin-bottom: 1.25rem;"></p>
+
+        <!-- AI Confidence Callout if available -->
+        <div id="modal-ai-box" class="info-callout" style="display: none; border-color: #7c3aed; background: #faf5ff;">
+          <strong>🤖 AI Computer Vision Classification:</strong>
+          <div id="modal-ai-details" style="margin-top: 0.25rem; color: #581c87;"></div>
+        </div>
+
+        <!-- Issue Metadata Grid -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; background: var(--color-surface-muted); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--color-border); font-size: 0.85rem; margin-bottom: 1.5rem;">
+          <div>
+            <span style="color: var(--color-text-muted);">Category:</span>
+            <strong id="modal-meta-category" style="display: block; color: var(--color-text-main);"></strong>
+          </div>
+          <div>
+            <span style="color: var(--color-text-muted);">Assigned Department:</span>
+            <strong id="modal-meta-dept" style="display: block; color: var(--color-text-main);"></strong>
+          </div>
+          <div>
+            <span style="color: var(--color-text-muted);">Assigned Officer:</span>
+            <strong id="modal-meta-officer" style="display: block; color: var(--color-text-main);"></strong>
+          </div>
+          <div>
+            <span style="color: var(--color-text-muted);">Reported By:</span>
+            <strong id="modal-meta-reporter" style="display: block; color: var(--color-text-main);"></strong>
+          </div>
+          <div>
+            <span style="color: var(--color-text-muted);">Location / Coordinates:</span>
+            <strong id="modal-meta-address" style="display: block; color: var(--color-text-main);"></strong>
+          </div>
+          <div>
+            <span style="color: var(--color-text-muted);">Date Submitted:</span>
+            <strong id="modal-meta-date" style="display: block; color: var(--color-text-main);"></strong>
+          </div>
+        </div>
+
+        <!-- Administrative Actions (Quick Update) -->
+        <div style="background: #ffffff; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.5rem;">
+          <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.75rem;">Officer & Admin Actions</h4>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <!-- Status update box -->
+            <div>
+              <label style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 0.35rem;">Change Status</label>
+              <select id="modal-status-select" class="form-control" style="font-size: 0.85rem; margin-bottom: 0.5rem;">
+                <option value="REPORTED">REPORTED</option>
+                <option value="AI_CLASSIFIED">AI_CLASSIFIED</option>
+                <option value="ASSIGNED">ASSIGNED</option>
+                <option value="IN_PROGRESS">IN_PROGRESS</option>
+                <option value="RESOLVED">RESOLVED</option>
+                <option value="REJECTED">REJECTED</option>
+              </select>
+              <input type="text" id="modal-status-notes" class="form-control" placeholder="Update notes / inspection log" style="font-size: 0.85rem; margin-bottom: 0.5rem;">
+              <button id="btn-modal-update-status" class="btn btn-primary" style="width: 100%; font-size: 0.8rem; padding: 0.5rem;">
+                Update Status
+              </button>
+            </div>
+
+            <!-- Department assign box -->
+            <div>
+              <label style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 0.35rem;">Reassign Department</label>
+              <select id="modal-assign-dept-select" class="form-control" style="font-size: 0.85rem; margin-bottom: 0.5rem;">
+                <!-- Populated via JS -->
+              </select>
+              <input type="text" id="modal-assign-notes" class="form-control" placeholder="Routing / dispatch notes" style="font-size: 0.85rem; margin-bottom: 0.5rem;">
+              <button id="btn-modal-assign-dept" class="btn btn-secondary" style="width: 100%; font-size: 0.8rem; padding: 0.5rem;">
+                Reassign Department
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Audit Timeline History -->
+        <div>
+          <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.5rem;">Issue Resolution Timeline & Audit History</h4>
+          <div id="modal-timeline" class="timeline">
+            <!-- Timeline items rendered dynamically -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Vanilla JavaScript Modules -->
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
