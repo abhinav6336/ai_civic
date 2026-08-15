@@ -10,8 +10,10 @@ import com.civic.reporting.enums.IssueStatus;
 import com.civic.reporting.service.IssueService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -26,8 +28,22 @@ public class IssueController {
         this.issueService = issueService;
     }
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<IssueResponse>> reportIssue(@Valid @RequestBody IssueCreateRequest request) {
+    /**
+     * Multipart form submission for citizen issue reporting with optional photo attachment.
+     */
+    @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<ApiResponse<IssueResponse>> reportIssueMultipart(
+            @ModelAttribute IssueCreateRequest request,
+            @RequestParam(value = "image", required = false) MultipartFile imageFile) {
+        IssueResponse created = issueService.createIssue(request, imageFile);
+        return new ResponseEntity<>(ApiResponse.ok("Issue submitted successfully", created), HttpStatus.CREATED);
+    }
+
+    /**
+     * JSON payload submission for API integrations.
+     */
+    @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<ApiResponse<IssueResponse>> reportIssueJson(@Valid @RequestBody IssueCreateRequest request) {
         IssueResponse created = issueService.createIssue(request);
         return new ResponseEntity<>(ApiResponse.ok("Issue submitted successfully", created), HttpStatus.CREATED);
     }

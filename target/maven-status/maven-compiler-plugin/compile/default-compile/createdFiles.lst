@@ -3,7 +3,9 @@ com/civic/reporting/enums/IssueCategory.class
 com/civic/reporting/entity/Department.class
 com/civic/reporting/entity/User.class
 com/civic/reporting/service/DashboardService.class
+com/civic/reporting/dto/response/AuthResponse.class
 com/civic/reporting/config/CorsConfig$1.class
+com/civic/reporting/service/impl/FileStorageServiceImpl.class
 com/civic/reporting/repository/AIClassificationRepository.class
 com/civic/reporting/enums/IssueStatus.class
 com/civic/reporting/repository/IssueUpdateRepository.class
@@ -28,13 +30,16 @@ com/civic/reporting/service/DepartmentService.class
 com/civic/reporting/exception/ErrorResponse.class
 com/civic/reporting/CivicReportingApplication.class
 com/civic/reporting/dto/request/IssueAssignRequest.class
+com/civic/reporting/controller/AuthController.class
 com/civic/reporting/service/impl/IssueServiceImpl$1.class
 com/civic/reporting/dto/response/ApiResponse.class
 com/civic/reporting/entity/IssueUpdate.class
-com/civic/reporting/service/impl/DashboardServiceImpl.class
 com/civic/reporting/dto/response/IssueResponse.class
+com/civic/reporting/service/impl/DashboardServiceImpl.class
 com/civic/reporting/dto/response/IssueUpdateResponse.class
 com/civic/reporting/dto/response/DashboardStatsResponse.class
+com/civic/reporting/service/FileStorageService.class
+com/civic/reporting/dto/request/LoginRequest.class
 com/civic/reporting/controller/DepartmentController.class
 com/civic/reporting/controller/IssueController.class
 com/civic/reporting/dto/response/UserResponse.class

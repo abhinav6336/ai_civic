@@ -1,20 +1,17 @@
 package com.civic.reporting.dto.request;
 
 import com.civic.reporting.enums.IssueCategory;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public class IssueCreateRequest {
 
-    @NotBlank(message = "Title is required")
-    @Size(min = 5, max = 200, message = "Title must be between 5 and 200 characters")
+    @Size(max = 200, message = "Title must not exceed 200 characters")
     private String title;
 
-    @NotBlank(message = "Description is required")
-    @Size(min = 10, max = 3000, message = "Description must be between 10 and 3000 characters")
+    @Size(max = 3000, message = "Description must not exceed 3000 characters")
     private String description;
 
-    private IssueCategory category;
+    private IssueCategory category = IssueCategory.OTHER;
 
     private Double latitude;
     private Double longitude;

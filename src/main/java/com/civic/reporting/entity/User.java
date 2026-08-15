@@ -21,11 +21,14 @@ public class User {
     @Column(name = "phone", length = 25)
     private String phone;
 
+    @Column(name = "password", length = 200)
+    private String password;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false, length = 30)
     private UserRole role = UserRole.CITIZEN;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "department_id")
     private Department department;
 
@@ -38,6 +41,14 @@ public class User {
     public User(String name, String email, String phone, UserRole role) {
         this.name = name;
         this.email = email;
+        this.phone = phone;
+        this.role = role;
+    }
+
+    public User(String name, String email, String password, String phone, UserRole role) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
         this.phone = phone;
         this.role = role;
     }
@@ -78,6 +89,14 @@ public class User {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public UserRole getRole() {

@@ -7,11 +7,13 @@ import com.civic.reporting.dto.response.IssueResponse;
 import com.civic.reporting.entity.Issue;
 import com.civic.reporting.enums.IssueCategory;
 import com.civic.reporting.enums.IssueStatus;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface IssueService {
     IssueResponse createIssue(IssueCreateRequest request);
+    IssueResponse createIssue(IssueCreateRequest request, MultipartFile imageFile);
     List<IssueResponse> getAllIssues(IssueStatus status, IssueCategory category, Long departmentId, String searchTerm);
     IssueResponse getIssueByTrackingNumber(String trackingNumber);
     IssueResponse getIssueById(Long id);

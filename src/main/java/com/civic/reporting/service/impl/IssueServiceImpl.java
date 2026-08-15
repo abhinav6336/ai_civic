@@ -17,10 +17,12 @@ import com.civic.reporting.repository.DepartmentRepository;
 import com.civic.reporting.repository.IssueRepository;
 import com.civic.reporting.repository.IssueUpdateRepository;
 import com.civic.reporting.repository.UserRepository;
+import com.civic.reporting.service.FileStorageService;
 import com.civic.reporting.service.IssueService;
 import com.civic.reporting.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -37,21 +39,29 @@ public class IssueServiceImpl implements IssueService {
     private final DepartmentRepository departmentRepository;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final FileStorageService fileStorageService;
 
     public IssueServiceImpl(IssueRepository issueRepository,
                             IssueUpdateRepository issueUpdateRepository,
                             DepartmentRepository departmentRepository,
                             UserRepository userRepository,
-                            UserService userService) {
+                            UserService userService,
+                            FileStorageService fileStorageService) {
         this.issueRepository = issueRepository;
         this.issueUpdateRepository = issueUpdateRepository;
         this.departmentRepository = departmentRepository;
         this.userRepository = userRepository;
         this.userService = userService;
+        this.fileStorageService = fileStorageService;
     }
 
     @Override
     public IssueResponse createIssue(IssueCreateRequest request) {
+        return createIssue(request, null);
+    }
+
+    @Override
+    public IssueResponse createIssue(IssueCreateRequest request, MultipartFile imageFile) {
         User citizen = userService.getOrCreateCitizen(
                 request.getCitizenId(),
                 request.getCitizenName(),
@@ -59,17 +69,38 @@ public class IssueServiceImpl implements IssueService {
                 request.getCitizenPhone()
         );
 
+        IssueCategory category = request.getCategory() != null ? request.getCategory() : IssueCategory.OTHER;
+
+        String title = (request.getTitle() != null && !request.getTitle().trim().isEmpty())
+                ? request.getTitle().trim()
+                : generateDefaultTitle(category, request.getAddress());
+
+        String description = (request.getDescription() != null && !request.getDescription().trim().isEmpty())
+                ? request.getDescription().trim()
+                : "Civic issue reported for " + category.getDisplayName() + (request.getAddress() != null ? " at " + request.getAddress() : ".");
+
         Issue issue = new Issue();
         issue.setTrackingNumber(generateTrackingNumber());
-        issue.setTitle(request.getTitle().trim());
-        issue.setDescription(request.getDescription().trim());
-        issue.setCategory(request.getCategory() != null ? request.getCategory() : IssueCategory.OTHER);
+        issue.setTitle(title);
+        issue.setDescription(description);
+        issue.setCategory(category);
         issue.setStatus(IssueStatus.REPORTED);
         issue.setLatitude(request.getLatitude());
         issue.setLongitude(request.getLongitude());
         issue.setAddress(request.getAddress());
-        issue.setImageUrl(request.getImageUrl());
         issue.setCitizen(citizen);
+
+        // Handle image file storage
+        if (imageFile != null && !imageFile.isEmpty()) {
+            String storedImageUrl = fileStorageService.storeIssueImage(imageFile);
+            issue.setImageUrl(storedImageUrl);
+        } else if (request.getImageUrl() != null && !request.getImageUrl().trim().isEmpty()) {
+            // Only accept valid URL paths (do not accept huge Base64 data strings)
+            String rawUrl = request.getImageUrl().trim();
+            if (!rawUrl.startsWith("data:image")) {
+                issue.setImageUrl(rawUrl.length() > 500 ? rawUrl.substring(0, 500) : rawUrl);
+            }
+        }
 
         // Pre-route to department if category is provided
         if (issue.getCategory() != null && issue.getCategory() != IssueCategory.OTHER) {
@@ -216,9 +247,24 @@ public class IssueServiceImpl implements IssueService {
     }
 
     private String generateTrackingNumber() {
-        String datePart = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        String randomPart = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
-        return "CIVIC-" + datePart + "-" + randomPart;
+        int year = LocalDate.now().getYear();
+        int randomNum = 10000 + (int)(Math.random() * 90000);
+        return "CIV-" + year + "-" + randomNum;
+    }
+
+    private String generateDefaultTitle(IssueCategory category, String address) {
+        String catName = switch (category) {
+            case ROADS -> "Road Maintenance Issue";
+            case ELECTRICITY -> "Streetlight / Electrical Problem";
+            case GARBAGE_SANITATION -> "Garbage / Sanitation Concern";
+            case WATER -> "Water Pipeline / Supply Issue";
+            case DRAINAGE -> "Drainage / Sewage Overflow";
+            default -> "Civic Infrastructure Concern";
+        };
+        if (address != null && !address.trim().isEmpty()) {
+            return catName + " (" + address.trim() + ")";
+        }
+        return catName;
     }
 
     private String mapCategoryToDepartmentCode(IssueCategory category) {

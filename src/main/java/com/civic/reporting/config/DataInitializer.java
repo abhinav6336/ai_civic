@@ -92,48 +92,48 @@ public class DataInitializer implements CommandLineRunner {
         ));
 
         // 2. Seed Users (Admin, Officers, Citizens)
-        User admin = new User("Municipal Administrator", "admin@civic-portal.gov", "+1-800-555-0001", UserRole.ADMIN);
+        User admin = new User("Municipal Administrator", "admin@civic.gov", "admin123", "+1-800-555-0001", UserRole.ADMIN);
         userRepository.save(admin);
 
-        User roadOfficer = new User("Marcus Vance (Roads)", "m.vance@civic-portal.gov", "+1-800-555-0101", UserRole.OFFICER);
+        User roadOfficer = new User("Marcus Vance (Roads)", "officer.road@civic.gov", "officer123", "+1-800-555-0101", UserRole.OFFICER);
         roadOfficer.setDepartment(roadDept);
         userRepository.save(roadOfficer);
 
-        User elecOfficer = new User("Elena Ramos (Electricity)", "e.ramos@civic-portal.gov", "+1-800-555-0102", UserRole.OFFICER);
+        User elecOfficer = new User("Elena Ramos (Electricity)", "officer.electricity@civic.gov", "officer123", "+1-800-555-0102", UserRole.OFFICER);
         elecOfficer.setDepartment(elecDept);
         userRepository.save(elecOfficer);
 
-        User sanOfficer = new User("David Chen (Sanitation)", "d.chen@civic-portal.gov", "+1-800-555-0103", UserRole.OFFICER);
+        User sanOfficer = new User("David Chen (Sanitation)", "officer.sanitation@civic.gov", "officer123", "+1-800-555-0103", UserRole.OFFICER);
         sanOfficer.setDepartment(sanDept);
         userRepository.save(sanOfficer);
 
-        User waterOfficer = new User("Sarah Jenkins (Water)", "s.jenkins@civic-portal.gov", "+1-800-555-0104", UserRole.OFFICER);
+        User waterOfficer = new User("Sarah Jenkins (Water)", "officer.water@civic.gov", "officer123", "+1-800-555-0104", UserRole.OFFICER);
         waterOfficer.setDepartment(waterDept);
         userRepository.save(waterOfficer);
 
-        User drainOfficer = new User("Carlos Gomez (Drainage)", "c.gomez@civic-portal.gov", "+1-800-555-0105", UserRole.OFFICER);
+        User drainOfficer = new User("Carlos Gomez (Drainage)", "officer.drainage@civic.gov", "officer123", "+1-800-555-0105", UserRole.OFFICER);
         drainOfficer.setDepartment(drainDept);
         userRepository.save(drainOfficer);
 
-        User citizen1 = new User("Aarav Sharma", "aarav.sharma@example.com", "+1-555-0199", UserRole.CITIZEN);
-        User citizen2 = new User("Maya Patel", "maya.patel@example.com", "+1-555-0188", UserRole.CITIZEN);
+        User citizen1 = new User("Aarav Sharma", "aarav.sharma@example.com", "citizen123", "+1-555-0199", UserRole.CITIZEN);
+        User citizen2 = new User("Maya Patel", "maya.patel@example.com", "citizen123", "+1-555-0188", UserRole.CITIZEN);
         userRepository.saveAll(List.of(citizen1, citizen2));
 
         // 3. Seed Sample Issues & Audit Updates
         // Issue 1: Pothole on Main Boulevard
         Issue issue1 = new Issue();
-        issue1.setTrackingNumber("CIVIC-20260814-POT01");
-        issue1.setTitle("Severe Deep Pothole near Central Metro Station");
-        issue1.setDescription("A 2-foot wide pothole in the center lane causing dangerous vehicle swerves and tire damage.");
+        issue1.setTrackingNumber("CIV-2026-00124");
+        issue1.setTitle("Pothole on Main Boulevard");
+        issue1.setDescription("Deep pothole in the center lane causing dangerous vehicle swerves.");
         issue1.setCategory(IssueCategory.ROADS);
         issue1.setStatus(IssueStatus.IN_PROGRESS);
         issue1.setLatitude(37.7749);
         issue1.setLongitude(-122.4194);
-        issue1.setAddress("450 Market St, Financial District");
+        issue1.setAddress("450 Market St, Sector 4");
         issue1.setCitizen(citizen1);
         issue1.setAssignedDepartment(roadDept);
         issue1.setAssignedOfficer(roadOfficer);
-        issue1.setAiConfidence(0.96);
+        issue1.setAiConfidence(0.94);
         issue1.setAiSuggestedCategory("ROADS");
         issue1 = issueRepository.save(issue1);
 
@@ -149,9 +149,9 @@ public class DataInitializer implements CommandLineRunner {
 
         // Issue 2: Garbage Overflow in Community Park
         Issue issue2 = new Issue();
-        issue2.setTrackingNumber("CIVIC-20260814-GAR02");
+        issue2.setTrackingNumber("CIV-2026-00125");
         issue2.setTitle("Uncollected Garbage Dump Overflowing at Lincoln Park");
-        issue2.setDescription("Commercial bins overflowing with waste for the past 3 days, creating odor and attracting pests.");
+        issue2.setDescription("Commercial bins overflowing with waste for the past 3 days, creating odor.");
         issue2.setCategory(IssueCategory.GARBAGE_SANITATION);
         issue2.setStatus(IssueStatus.ASSIGNED);
         issue2.setLatitude(37.7833);
@@ -173,9 +173,9 @@ public class DataInitializer implements CommandLineRunner {
 
         // Issue 3: Streetlight Malfunction
         Issue issue3 = new Issue();
-        issue3.setTrackingNumber("CIVIC-20260814-ELE03");
-        issue3.setTitle("Flickering and Dead Streetlights on Oakwood Avenue");
-        issue3.setDescription("Three consecutive street poles are dark, making pedestrian crossing unsafe after dusk.");
+        issue3.setTrackingNumber("CIV-2026-00126");
+        issue3.setTitle("Flickering Streetlights on Oakwood Avenue");
+        issue3.setDescription("Three street poles are dark, making pedestrian crossing unsafe after dusk.");
         issue3.setCategory(IssueCategory.ELECTRICITY);
         issue3.setStatus(IssueStatus.RESOLVED);
         issue3.setLatitude(37.7690);
@@ -197,8 +197,8 @@ public class DataInitializer implements CommandLineRunner {
 
         // Issue 4: Water Main Leak
         Issue issue4 = new Issue();
-        issue4.setTrackingNumber("CIVIC-20260814-WAT04");
-        issue4.setTitle("Clean Water Gushing from Pavement Valve");
+        issue4.setTrackingNumber("CIV-2026-00127");
+        issue4.setTitle("Water Gushing from Pavement Valve");
         issue4.setDescription("Underground water pipe joint leaking steadily onto the sidewalk.");
         issue4.setCategory(IssueCategory.WATER);
         issue4.setStatus(IssueStatus.REPORTED);
