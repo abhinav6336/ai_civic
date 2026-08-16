@@ -43,6 +43,36 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
+        // Sync admin & officer credentials
+        userRepository.findByEmail("admin@civic.gov").ifPresentOrElse(
+                adminUser -> {
+                    if (adminUser.getPassword() == null || adminUser.getPassword().isEmpty()) {
+                        adminUser.setPassword("admin123");
+                        userRepository.save(adminUser);
+                    }
+                },
+                () -> {
+                    userRepository.findByEmail("admin@civic-portal.gov").ifPresentOrElse(
+                            oldAdmin -> {
+                                oldAdmin.setEmail("admin@civic.gov");
+                                oldAdmin.setPassword("admin123");
+                                userRepository.save(oldAdmin);
+                            },
+                            () -> {
+                                User newAdmin = new User("Municipal Administrator", "admin@civic.gov", "admin123", "+1-800-555-0001", UserRole.ADMIN);
+                                userRepository.save(newAdmin);
+                            }
+                    );
+                }
+        );
+
+        for (User u : userRepository.findAll()) {
+            if (u.getRole() == UserRole.OFFICER && (u.getPassword() == null || u.getPassword().isEmpty())) {
+                u.setPassword("officer123");
+                userRepository.save(u);
+            }
+        }
+
         if (departmentRepository.count() > 0) {
             log.info("Database already initialized with municipal data.");
             return;

@@ -148,6 +148,15 @@ const CivicApi = {
     return await res.json();
   },
 
+  // AI-Assisted Civic Insights & Analytics
+  async getCivicInsights() {
+    const res = await fetch(`${API_BASE}/dashboard/insights`, {
+      headers: this.getAuthHeaders()
+    });
+    if (!res.ok) throw await this.extractError(res);
+    return await res.json();
+  },
+
   async extractError(res) {
     try {
       const json = await res.json();

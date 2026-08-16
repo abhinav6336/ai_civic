@@ -72,11 +72,36 @@ const App = {
 
     // View specific triggers
     if (viewName === 'report') {
+      this.stopAdminPolling();
       this.resetWizard();
     } else if (viewName === 'my-complaints') {
+      this.stopAdminPolling();
       this.loadMyComplaints();
     } else if (viewName === 'admin-dashboard') {
       this.checkAdminAuthAndLoad();
+      this.startAdminPolling();
+    } else {
+      this.stopAdminPolling();
+    }
+  },
+
+  startAdminPolling() {
+    this.stopAdminPolling();
+    this.adminPollTimer = setInterval(() => {
+      if (this.currentView === 'admin-dashboard') {
+        this.loadAdminStats();
+        const activePane = document.querySelector('.admin-tab-pane:not([style*="none"])');
+        if (!activePane || activePane.id === 'admin-tab-overview') {
+          this.loadAdminComplaintsTable();
+        }
+      }
+    }, 8000);
+  },
+
+  stopAdminPolling() {
+    if (this.adminPollTimer) {
+      clearInterval(this.adminPollTimer);
+      this.adminPollTimer = null;
     }
   },
 
@@ -688,23 +713,34 @@ const App = {
       pane.style.display = pane.id === `admin-tab-${tabName}` ? 'block' : 'none';
     });
 
-    if (tabName === 'departments') {
+    if (tabName === 'insights') {
+      this.loadCivicInsights();
+    } else if (tabName === 'departments') {
       this.renderAdminDepartmentsTab();
-    } else if (tabName === 'complaints') {
+    } else if (tabName === 'complaints' || tabName === 'overview') {
       this.loadAdminComplaintsTable();
     }
   },
 
+  // ============================================================================
+  // 5. ADMIN OPERATIONS & COMPLAINTS MANAGEMENT
+  // ============================================================================
   async loadAdminStats() {
     try {
       const res = await CivicApi.getStats();
       if (res.success && res.data) {
         const d = res.data;
-        document.getElementById('adm-stat-total').textContent = d.totalIssues;
-        document.getElementById('adm-stat-new').textContent = d.reportedIssues;
-        document.getElementById('adm-stat-review').textContent = d.aiClassifiedIssues;
-        document.getElementById('adm-stat-progress').textContent = d.inProgressIssues;
-        document.getElementById('adm-stat-resolved').textContent = d.resolvedIssues;
+        const totalEl = document.getElementById('adm-stat-total');
+        const newEl = document.getElementById('adm-stat-new');
+        const revEl = document.getElementById('adm-stat-review');
+        const progEl = document.getElementById('adm-stat-progress');
+        const resEl = document.getElementById('adm-stat-resolved');
+
+        if (totalEl) totalEl.textContent = d.totalIssues;
+        if (newEl) newEl.textContent = d.reportedIssues;
+        if (revEl) revEl.textContent = d.aiClassifiedIssues;
+        if (progEl) progEl.textContent = d.inProgressIssues;
+        if (resEl) resEl.textContent = d.resolvedIssues;
       }
     } catch (err) {
       console.error('Stats load failed:', err);
@@ -714,8 +750,6 @@ const App = {
   async loadAdminComplaintsTable() {
     const tableBody = document.getElementById('admin-complaints-tbody');
     if (!tableBody) return;
-
-    tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 2rem;">Loading complaints...</td></tr>';
 
     const status = document.getElementById('admin-filter-status')?.value || '';
     const deptId = document.getElementById('admin-filter-dept')?.value || '';
@@ -742,14 +776,14 @@ const App = {
 
     tbody.innerHTML = issues.map(i => `
       <tr>
-        <td style="font-family: monospace; font-weight: 700; color: var(--primary);">${i.trackingNumber}</td>
+        <td style="font-family: monospace; font-weight: 700; color: var(--primary);">${this.escapeHtml(i.trackingNumber)}</td>
         <td><b>${this.escapeHtml(i.title || i.category)}</b></td>
-        <td>${this.escapeHtml(i.address || 'N/A')}</td>
-        <td>${i.assignedDepartmentName || '<span style="color:var(--text-light)">Unassigned</span>'}</td>
+        <td>${this.escapeHtml(i.address || 'Location provided')}</td>
+        <td>${i.assignedDepartmentName ? this.escapeHtml(i.assignedDepartmentName) : '<span style="color:var(--text-light)">Unassigned</span>'}</td>
         <td>${this.getStatusBadgeHtml(i.status)}</td>
         <td>${new Date(i.createdAt).toLocaleDateString([], {month:'short', day:'numeric'})}</td>
         <td>
-          <button class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; min-height: 36px;" onclick="App.openAdminComplaintModal(${i.id})">
+          <button class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; min-height: 32px;" onclick="App.openAdminComplaintModal(${i.id})">
             View
           </button>
         </td>
@@ -832,6 +866,360 @@ const App = {
       const isSel = selectedId && selectedId === d.id ? 'selected' : '';
       sel.innerHTML += `<option value="${d.id}" ${isSel}>${d.name}</option>`;
     });
+  },
+
+  // ============================================================================
+  // 6. AI-ASSISTED CIVIC INSIGHTS & ANALYTICS
+  // ============================================================================
+  async loadCivicInsights() {
+    try {
+      const res = await CivicApi.getCivicInsights();
+      if (res.success && res.data) {
+        const insights = res.data;
+        this.renderCivicInsightsView(insights);
+      }
+    } catch (err) {
+      this.showToast(`Failed to load insights: ${err.message}`, true);
+    }
+  },
+
+  renderCivicInsightsView(insights) {
+    const obs = insights.observedData;
+    const algo = insights.algorithmicInsights;
+
+    // 1. Top KPI Summary Numbers
+    const totalEl = document.getElementById('ins-stat-total');
+    const resRateEl = document.getElementById('ins-stat-resolution-rate');
+    const clustersEl = document.getElementById('ins-stat-clusters');
+    const bottlenecksEl = document.getElementById('ins-stat-bottlenecks');
+
+    if (totalEl) totalEl.textContent = obs.totalComplaints;
+    if (resRateEl) resRateEl.textContent = `${obs.overallResolutionRate}%`;
+    if (clustersEl) clustersEl.textContent = algo.spatialClusters ? algo.spatialClusters.length : 0;
+    if (bottlenecksEl) {
+      const bCount = (algo.workloadBottlenecks || []).filter(b => b.bottleneckSeverity !== 'NORMAL').length;
+      bottlenecksEl.textContent = bCount;
+    }
+
+    // 2. Render Observed Category Bars
+    this.renderObservedCategories(obs.categoryBreakdown, obs.totalComplaints);
+
+    // 3. Render Observed Department Workloads
+    this.renderObservedDepartments(obs.departmentWorkloads);
+
+    // 4. Render Frequent Locations
+    this.renderObservedLocations(obs.frequentLocations);
+
+    // 5. Render Spatial Clusters & Map
+    this.renderSpatialClustersAndMap(algo.spatialClusters);
+
+    // 6. Render Recurring Patterns
+    this.renderRecurringPatterns(algo.recurringPatterns);
+
+    // 7. Render Workload Bottlenecks
+    this.renderWorkloadBottlenecks(algo.workloadBottlenecks);
+
+    // 8. Render Unresolved Patterns
+    this.renderUnresolvedPatterns(algo.unresolvedPatterns);
+
+    // 9. Render Strategic Recommendations
+    this.renderRecommendations(algo.recommendations);
+  },
+
+  renderObservedCategories(categories, total) {
+    const container = document.getElementById('ins-observed-categories');
+    if (!container) return;
+
+    if (!categories || categories.length === 0 || total === 0) {
+      container.innerHTML = '<p style="font-size:0.85rem; color:var(--text-muted);">No historical complaint data available.</p>';
+      return;
+    }
+
+    container.innerHTML = categories.map(cat => {
+      let fillClass = 'primary';
+      if (cat.category === 'ROADS') fillClass = 'warning';
+      else if (cat.category === 'WATER') fillClass = 'primary';
+      else if (cat.category === 'GARBAGE_SANITATION') fillClass = 'success';
+      else if (cat.category === 'ELECTRICITY') fillClass = 'purple';
+
+      return `
+        <div class="bar-chart-row">
+          <div class="bar-chart-label-row">
+            <span>${this.escapeHtml(cat.displayName)}</span>
+            <span style="color: var(--text-muted);">${cat.count} (${cat.percentage}%)</span>
+          </div>
+          <div class="bar-chart-track">
+            <div class="bar-chart-fill ${fillClass}" style="width: ${Math.max(cat.percentage, 4)}%;"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  },
+
+  renderObservedDepartments(departments) {
+    const container = document.getElementById('ins-observed-departments');
+    if (!container) return;
+
+    if (!departments || departments.length === 0) {
+      container.innerHTML = '<p style="font-size:0.85rem; color:var(--text-muted);">No department workload data available.</p>';
+      return;
+    }
+
+    container.innerHTML = departments.map(d => `
+      <div style="background: var(--surface-alt); border-radius: var(--radius-md); padding: 0.75rem 1rem; margin-bottom: 0.6rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.35rem;">
+          <strong style="font-size: 0.9rem;">${this.escapeHtml(d.departmentName)}</strong>
+          <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">${d.totalCount} Total</span>
+        </div>
+        <div style="display:flex; gap: 0.75rem; font-size: 0.8rem; margin-bottom: 0.4rem; flex-wrap: wrap;">
+          <span style="color: var(--warning); font-weight: 600;">⏳ Pending: ${d.pendingCount}</span>
+          <span style="color: var(--primary); font-weight: 600;">⚙️ In Progress: ${d.inProgressCount}</span>
+          <span style="color: var(--success); font-weight: 600;">✅ Resolved: ${d.resolvedCount}</span>
+        </div>
+        <div class="bar-chart-track" style="height: 6px;">
+          <div class="bar-chart-fill success" style="width: ${d.resolutionRate}%;"></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size: 0.7rem; color: var(--text-light); margin-top: 0.2rem;">
+          <span>Resolution: ${d.resolutionRate}%</span>
+          <span>Workload Share: ${d.workloadSharePercent}%</span>
+        </div>
+      </div>
+    `).join('');
+  },
+
+  renderObservedLocations(locations) {
+    const container = document.getElementById('ins-observed-locations');
+    if (!container) return;
+
+    if (!locations || locations.length === 0) {
+      container.innerHTML = '<p style="font-size:0.85rem; color:var(--text-muted);">No frequent location records.</p>';
+      return;
+    }
+
+    container.innerHTML = locations.map((loc, idx) => `
+      <div style="display:flex; justify-content:space-between; align-items:center; padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">
+        <div style="display:flex; align-items:center; gap: 0.5rem;">
+          <span style="font-weight: 800; color: var(--text-light); width: 18px;">#${idx + 1}</span>
+          <div>
+            <div style="font-weight: 600;">${this.escapeHtml(loc.location)}</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Dominant: ${loc.primaryCategory}</div>
+          </div>
+        </div>
+        <div style="text-align: right;">
+          <span style="font-weight: 700; color: var(--primary);">${loc.totalCount} reports</span>
+          <div style="font-size: 0.75rem; color: var(--warning);">${loc.pendingCount} open</div>
+        </div>
+      </div>
+    `).join('');
+  },
+
+  renderSpatialClustersAndMap(clusters) {
+    const listContainer = document.getElementById('ins-clusters-list');
+    const mapEl = document.getElementById('insights-cluster-map');
+
+    if (!clusters || clusters.length === 0) {
+      if (listContainer) listContainer.innerHTML = '<p style="font-size:0.85rem; color:var(--text-muted);">No geographic clusters detected.</p>';
+      return;
+    }
+
+    // 1. Render Cluster Cards List
+    if (listContainer) {
+      listContainer.innerHTML = clusters.map(c => {
+        let tagClass = 'low';
+        if (c.riskLevel === 'HIGH') tagClass = 'high';
+        else if (c.riskLevel === 'MEDIUM') tagClass = 'medium';
+
+        return `
+          <div class="cluster-list-item">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.35rem;">
+              <strong style="font-size: 0.9rem;">${this.escapeHtml(c.clusterName)}</strong>
+              <span class="risk-tag ${tagClass}">${c.riskLevel} RISK</span>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-main); margin-bottom: 0.4rem;">${this.escapeHtml(c.summary)}</p>
+            <div style="display:flex; justify-content:space-between; font-size: 0.75rem; color: var(--text-muted);">
+              <span>Dominant: <b>${c.dominantCategory}</b></span>
+              <span>Tickets: ${c.trackingNumbers ? c.trackingNumbers.slice(0, 3).join(', ') : ''}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 2. Render Interactive Leaflet Map
+    if (mapEl && typeof L !== 'undefined') {
+      if (this.insightsMap) {
+        this.insightsMap.remove();
+        this.insightsMap = null;
+      }
+
+      // Initialize map centered at first cluster centroid
+      const first = clusters[0];
+      const initialLat = first.latitude || 37.7749;
+      const initialLon = first.longitude || -122.4194;
+
+      this.insightsMap = L.map('insights-cluster-map', {
+        zoomControl: true,
+        attributionControl: false
+      }).setView([initialLat, initialLon], 13);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18
+      }).addTo(this.insightsMap);
+
+      const bounds = [];
+
+      clusters.forEach(c => {
+        if (!c.latitude || !c.longitude) return;
+        const latLng = [c.latitude, c.longitude];
+        bounds.push(latLng);
+
+        let circleColor = '#16a34a';
+        if (c.riskLevel === 'HIGH') circleColor = '#dc2626';
+        else if (c.riskLevel === 'MEDIUM') circleColor = '#d97706';
+
+        const circle = L.circle(latLng, {
+          color: circleColor,
+          fillColor: circleColor,
+          fillOpacity: 0.35,
+          radius: 200 + (c.complaintCount * 100)
+        }).addTo(this.insightsMap);
+
+        const marker = L.circleMarker(latLng, {
+          color: circleColor,
+          fillColor: circleColor,
+          fillOpacity: 0.9,
+          radius: 8
+        }).addTo(this.insightsMap);
+
+        const popupContent = `
+          <div style="font-family: sans-serif; min-width: 180px;">
+            <b style="color: ${circleColor};">${this.escapeHtml(c.clusterName)}</b><br>
+            <span style="font-size: 0.85rem;"><b>${c.complaintCount} Complaints</b></span><br>
+            <span style="font-size: 0.8rem; color: #555;">Dominant: ${c.dominantCategory}</span><br>
+            <span style="font-size: 0.75rem; color: #777;">Risk Level: <b>${c.riskLevel}</b></span>
+          </div>
+        `;
+        marker.bindPopup(popupContent);
+        circle.bindPopup(popupContent);
+      });
+
+      if (bounds.length > 0) {
+        this.insightsMap.fitBounds(bounds, { padding: [30, 30], maxZoom: 14 });
+      }
+
+      setTimeout(() => {
+        if (this.insightsMap) this.insightsMap.invalidateSize();
+      }, 300);
+    }
+  },
+
+  renderRecurringPatterns(patterns) {
+    const container = document.getElementById('ins-recurring-patterns');
+    if (!container) return;
+
+    if (!patterns || patterns.length === 0) {
+      container.innerHTML = '<p style="font-size:0.85rem; color:var(--text-muted);">No recurring chronic patterns detected in historical records.</p>';
+      return;
+    }
+
+    container.innerHTML = patterns.map(p => `
+      <div style="background: var(--surface-alt); border-left: 3px solid var(--warning); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 0.85rem 1rem; margin-bottom: 0.75rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.3rem;">
+          <strong style="font-size: 0.9rem;">📍 ${this.escapeHtml(p.location)}</strong>
+          <span style="font-size: 0.75rem; font-weight: 700; color: var(--warning);">${p.occurrences} Recurring</span>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-main); line-height: 1.4; margin-bottom: 0.4rem;">
+          <b>Diagnosis:</b> ${this.escapeHtml(p.diagnosis)}
+        </p>
+        <p style="font-size: 0.8rem; color: var(--primary); font-weight: 600;">
+          💡 <b>Action:</b> ${this.escapeHtml(p.recommendation)}
+        </p>
+      </div>
+    `).join('');
+  },
+
+  renderWorkloadBottlenecks(bottlenecks) {
+    const container = document.getElementById('ins-workload-bottlenecks');
+    if (!container) return;
+
+    if (!bottlenecks || bottlenecks.length === 0) {
+      container.innerHTML = '<p style="font-size:0.85rem; color:var(--text-muted);">All municipal departments operating within normal capacity.</p>';
+      return;
+    }
+
+    container.innerHTML = bottlenecks.map(b => {
+      let tagClass = 'low';
+      if (b.bottleneckSeverity === 'CRITICAL') tagClass = 'high';
+      else if (b.bottleneckSeverity === 'ELEVATED') tagClass = 'medium';
+
+      return `
+        <div style="border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 0.85rem 1rem; margin-bottom: 0.6rem; background: var(--surface);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.35rem;">
+            <strong style="font-size: 0.9rem;">${this.escapeHtml(b.departmentName)}</strong>
+            <span class="risk-tag ${tagClass}">${b.bottleneckSeverity}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.35rem;">
+            <span>Pending Backlog: <b>${b.pendingBacklog} tickets</b></span>
+            <span>Pressure Index: <b>${b.workloadPressureIndex}x</b></span>
+          </div>
+          <p style="font-size: 0.8rem; color: var(--text-main); line-height: 1.35;">
+            ${this.escapeHtml(b.recommendation)}
+          </p>
+        </div>
+      `;
+    }).join('');
+  },
+
+  renderUnresolvedPatterns(unresolved) {
+    const container = document.getElementById('ins-unresolved-patterns');
+    if (!container) return;
+
+    if (!unresolved || unresolved.length === 0) {
+      container.innerHTML = '<p style="font-size:0.85rem; color:var(--text-muted);">No unresolved queue stagnation detected.</p>';
+      return;
+    }
+
+    container.innerHTML = unresolved.map(u => `
+      <div style="padding: 0.75rem; border-radius: var(--radius-md); background: var(--surface-alt); margin-bottom: 0.6rem; font-size: 0.85rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.25rem;">
+          <strong>⏱️ ${this.escapeHtml(u.title)}</strong>
+          <span style="font-weight: 700; color: var(--danger); font-size: 0.8rem;">${u.affectedCount} Affected</span>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.25rem;">${this.escapeHtml(u.description)}</p>
+        <p style="color: var(--primary); font-size: 0.8rem; font-weight: 600;">Suggested Action: ${this.escapeHtml(u.actionSuggested)}</p>
+      </div>
+    `).join('');
+  },
+
+  renderRecommendations(recs) {
+    const container = document.getElementById('ins-recommendations-list');
+    if (!container) return;
+
+    if (!recs || recs.length === 0) {
+      container.innerHTML = '<p style="font-size:0.85rem; color:var(--text-muted);">No critical recommendations at this time.</p>';
+      return;
+    }
+
+    container.innerHTML = recs.map(r => {
+      let priorityClass = 'medium';
+      if (r.priority === 'URGENT') priorityClass = 'urgent';
+      else if (r.priority === 'HIGH') priorityClass = 'high';
+
+      return `
+        <div class="rec-card ${priorityClass}">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.35rem;">
+            <strong style="font-size: 0.95rem;">${this.escapeHtml(r.title)}</strong>
+            <span class="rec-priority-badge ${priorityClass}">${r.priority} PRIORITY</span>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.35rem;">
+            <b>Rationale:</b> ${this.escapeHtml(r.rationale)}
+          </p>
+          <div style="background: var(--surface-alt); padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); font-size: 0.85rem; color: var(--text-main);">
+            <b>Recommended Municipal Action:</b> ${this.escapeHtml(r.recommendedAction)}
+          </div>
+        </div>
+      `;
+    }).join('');
   },
 
   renderAdminDepartmentsTab() {
