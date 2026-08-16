@@ -385,6 +385,7 @@
           </div>
           <ul class="admin-sidebar-menu">
             <li><a class="admin-menu-link active" data-admin-tab="overview">📊 Dashboard</a></li>
+            <li><a class="admin-menu-link" data-admin-tab="insights">🧠 Civic Insights</a></li>
             <li><a class="admin-menu-link" data-admin-tab="complaints">📋 Complaints</a></li>
             <li><a class="admin-menu-link" data-admin-tab="departments">🏢 Departments</a></li>
             <li><a class="admin-menu-link" data-admin-tab="officers">👮 Officers</a></li>
@@ -470,6 +471,161 @@
                 </table>
               </div>
 
+            </div>
+
+          </div>
+
+          <!-- TAB: CIVIC INSIGHTS & ANALYTICS -->
+          <div id="admin-tab-insights" class="admin-tab-pane" style="display: none;">
+            
+            <div class="insights-top-banner">
+              <div>
+                <h2 style="font-size: 1.5rem; font-weight: 800;">🧠 AI-Assisted Civic Insights & Analytics</h2>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                  Historical pattern recognition, spatial complaint clusters, and departmental workload distribution.
+                </p>
+              </div>
+              <button class="btn btn-secondary" onclick="App.loadCivicInsights()" style="min-height: 38px; padding: 0.4rem 0.85rem; font-size: 0.85rem;">
+                🔄 Refresh Insights
+              </button>
+            </div>
+
+            <!-- Insights Overview Top KPI Cards -->
+            <div class="admin-stats-grid" style="margin-bottom: 2rem;">
+              <div class="admin-stat-card">
+                <div class="admin-stat-num" id="ins-stat-total">0</div>
+                <div class="admin-stat-lbl">Historical Complaints Analyzed</div>
+              </div>
+              <div class="admin-stat-card">
+                <div class="admin-stat-num" id="ins-stat-resolution-rate" style="color: var(--success);">0%</div>
+                <div class="admin-stat-lbl">Municipal Resolution Rate</div>
+              </div>
+              <div class="admin-stat-card">
+                <div class="admin-stat-num" id="ins-stat-clusters" style="color: #7c3aed;">0</div>
+                <div class="admin-stat-lbl">Spatial Hotspots Detected</div>
+              </div>
+              <div class="admin-stat-card">
+                <div class="admin-stat-num" id="ins-stat-bottlenecks" style="color: var(--warning);">0</div>
+                <div class="admin-stat-lbl">High-Pressure Departments</div>
+              </div>
+            </div>
+
+            <!-- Two-Pillar Architecture: OBSERVED DATA vs ALGORITHMIC INSIGHTS -->
+            <div class="insights-pillar-grid">
+              
+              <!-- PILLAR 1: OBSERVED HISTORICAL DATA -->
+              <div>
+                <div class="pillar-header">
+                  <span class="badge-observed">OBSERVED DATA</span>
+                  <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Ground-Truth MySQL Records</span>
+                </div>
+
+                <!-- 1. Most Common Categories -->
+                <div class="insights-card">
+                  <div class="insights-card-title">
+                    <span>📊 Common Issue Categories</span>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">Historical Volume</span>
+                  </div>
+                  <div id="ins-observed-categories">
+                    <!-- Dynamic Bars via JS -->
+                  </div>
+                </div>
+
+                <!-- 2. Department Workload Distribution -->
+                <div class="insights-card">
+                  <div class="insights-card-title">
+                    <span>🏢 Department Workload & Pending Queues</span>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">Pending vs Resolved</span>
+                  </div>
+                  <div id="ins-observed-departments">
+                    <!-- Dynamic Department Cards via JS -->
+                  </div>
+                </div>
+
+                <!-- 3. Top Reported Locations -->
+                <div class="insights-card">
+                  <div class="insights-card-title">
+                    <span>📍 High-Frequency Complaint Locations</span>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">Report Frequency</span>
+                  </div>
+                  <div id="ins-observed-locations">
+                    <!-- Dynamic Location Rankings via JS -->
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- PILLAR 2: AI / ALGORITHMIC INSIGHTS -->
+              <div>
+                <div class="pillar-header">
+                  <span class="badge-ai-insights">AI / ALGORITHMIC INSIGHTS</span>
+                  <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Clustering & Pattern Analytics</span>
+                </div>
+
+                <!-- 1. Spatial Clustering & Hotspots Map -->
+                <div class="insights-card">
+                  <div class="insights-card-title">
+                    <span>🗺️ Spatial Complaint Clusters & Hotspot Map</span>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">Distance Clustered</span>
+                  </div>
+                  <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+                    Identifies geographic concentration zones where multiple complaints are located in close proximity.
+                  </p>
+                  <div id="insights-cluster-map" class="insights-map-container"></div>
+                  <div id="ins-clusters-list" style="margin-top: 1rem;">
+                    <!-- Dynamic Clusters List via JS -->
+                  </div>
+                </div>
+
+                <!-- 2. Chronic Recurring Issue Patterns -->
+                <div class="insights-card">
+                  <div class="insights-card-title">
+                    <span>🔁 Recurring & Chronic Issue Patterns</span>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">Infrastructure Diagnosis</span>
+                  </div>
+                  <div id="ins-recurring-patterns">
+                    <!-- Dynamic Recurring Patterns via JS -->
+                  </div>
+                </div>
+
+                <!-- 3. Workload Bottlenecks & Backlog Stress -->
+                <div class="insights-card">
+                  <div class="insights-card-title">
+                    <span>⚠️ Workload Bottlenecks & Backlog Stress</span>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">Capacity Index</span>
+                  </div>
+                  <div id="ins-workload-bottlenecks">
+                    <!-- Dynamic Bottlenecks via JS -->
+                  </div>
+                </div>
+
+                <!-- 4. Unresolved Complaint Patterns -->
+                <div class="insights-card">
+                  <div class="insights-card-title">
+                    <span>⏳ Unresolved Complaint Patterns</span>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">Queue Dynamics</span>
+                  </div>
+                  <div id="ins-unresolved-patterns">
+                    <!-- Dynamic Unresolved Patterns via JS -->
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- SECTION: ACTIONABLE MUNICIPAL RECOMMENDATIONS -->
+            <div class="insights-card" style="margin-top: 1rem;">
+              <div class="insights-card-title">
+                <span style="font-size: 1.15rem;">🎯 Algorithmic Strategic Recommendations</span>
+                <span class="badge-ai-insights">AI ACTION PLAN</span>
+              </div>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+                Evidence-based suggestions generated algorithmically from observed historical data and detected spatial bottlenecks.
+              </p>
+              <div id="ins-recommendations-list">
+                <!-- Dynamic Recommendations via JS -->
+              </div>
             </div>
 
           </div>

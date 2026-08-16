@@ -3,8 +3,6 @@ package com.civic.reporting.repository;
 import com.civic.reporting.entity.Issue;
 import com.civic.reporting.enums.IssueCategory;
 import com.civic.reporting.enums.IssueStatus;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,14 +24,16 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
 
     List<Issue> findByAssignedDepartmentId(Long departmentId);
 
-    @Query("SELECT i FROM Issue i WHERE " +
-           "(:status IS NULL OR i.status = :status) AND " +
+    @Query("SELECT i FROM Issue i " +
+           "LEFT JOIN i.assignedDepartment d " +
+           "WHERE (:status IS NULL OR i.status = :status) AND " +
            "(:category IS NULL OR i.category = :category) AND " +
-           "(:departmentId IS NULL OR i.assignedDepartment.id = :departmentId) AND " +
-           "(:searchTerm IS NULL OR LOWER(i.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "(:departmentId IS NULL OR (d IS NOT NULL AND d.id = :departmentId)) AND " +
+           "(:searchTerm IS NULL OR " +
+           " LOWER(i.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
            " LOWER(i.trackingNumber) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-           " LOWER(i.address) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
-           "ORDER BY i.createdAt DESC")
+           " (i.address IS NOT NULL AND LOWER(i.address) LIKE LOWER(CONCAT('%', :searchTerm, '%')))) " +
+           "ORDER BY i.createdAt DESC, i.id DESC")
     List<Issue> findWithFilters(
             @Param("status") IssueStatus status,
             @Param("category") IssueCategory category,

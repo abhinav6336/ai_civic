@@ -820,6 +820,178 @@ textarea.form-input {
   box-shadow: var(--shadow-lg);
 }
 
+/* ==============================================================================
+   CIVIC INSIGHTS & ANALYTICS STYLES
+   ============================================================================== */
+.insights-top-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.insights-pillar-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 900px) {
+  .insights-pillar-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pillar-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--border-light);
+}
+
+.badge-observed {
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+}
+
+.badge-ai-insights {
+  background: #f3e8ff;
+  color: #7e22ce;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+}
+
+.insights-card {
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1.25rem;
+}
+
+.insights-card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Visual Bar Charts */
+.bar-chart-row {
+  margin-bottom: 0.85rem;
+}
+
+.bar-chart-label-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.bar-chart-track {
+  height: 10px;
+  background: var(--surface-alt);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+}
+
+.bar-chart-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--primary);
+  transition: width 0.6s ease;
+}
+
+.bar-chart-fill.success { background: var(--success); }
+.bar-chart-fill.warning { background: var(--warning); }
+.bar-chart-fill.purple { background: #8b5cf6; }
+
+/* Cluster Map */
+.insights-map-container {
+  height: 360px;
+  width: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  margin-top: 0.75rem;
+  z-index: 1;
+}
+
+/* Cluster List Item */
+.cluster-list-item {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.75rem;
+  background: var(--surface-alt);
+  transition: transform 0.15s ease;
+}
+
+.cluster-list-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.risk-tag {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+}
+
+.risk-tag.high { background: #fee2e2; color: #b91c1c; }
+.risk-tag.medium { background: #fef3c7; color: #b45309; }
+.risk-tag.low { background: #dcfce7; color: #15803d; }
+
+/* Recommendations */
+.rec-card {
+  border-left: 4px solid var(--primary);
+  background: var(--surface);
+  border-top: 1px solid var(--border-light);
+  border-right: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.85rem;
+}
+
+.rec-card.urgent { border-left-color: var(--danger); }
+.rec-card.high { border-left-color: var(--warning); }
+.rec-card.medium { border-left-color: var(--primary); }
+
+.rec-priority-badge {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+}
+
+.rec-priority-badge.urgent { background: #fee2e2; color: #b91c1c; }
+.rec-priority-badge.high { background: #fef3c7; color: #b45309; }
+.rec-priority-badge.medium { background: #e0f2fe; color: #0369a1; }
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .admin-layout {

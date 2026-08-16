@@ -13,6 +13,7 @@
 /home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/dto/request/UserCreateRequest.java
 /home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/dto/response/ApiResponse.java
 /home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/dto/response/AuthResponse.java
+/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/dto/response/CivicInsightsResponse.java
 /home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/dto/response/DashboardStatsResponse.java
 /home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/dto/response/DepartmentResponse.java
 /home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/dto/response/IssueResponse.java
@@ -35,11 +36,13 @@
 /home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/repository/IssueRepository.java
 /home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/repository/IssueUpdateRepository.java
 /home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/repository/UserRepository.java
+/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/service/CivicInsightsService.java
 /home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/service/DashboardService.java
 /home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/service/DepartmentService.java
 /home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/service/FileStorageService.java
 /home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/service/IssueService.java
 /home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/service/UserService.java
+/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/service/impl/CivicInsightsServiceImpl.java
 /home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/service/impl/DashboardServiceImpl.java
 /home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/service/impl/DepartmentServiceImpl.java
 /home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/service/impl/FileStorageServiceImpl.java
