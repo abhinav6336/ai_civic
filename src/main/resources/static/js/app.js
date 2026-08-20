@@ -157,6 +157,47 @@ const App = {
       });
     });
 
+    // Step 4: Real-time AI category suggestion
+    const descInput = document.getElementById('report-desc-input');
+    const suggestBox = document.getElementById('ai-smart-suggest-box');
+    let aiTimer = null;
+    if (descInput && suggestBox) {
+      descInput.addEventListener('input', () => {
+        clearTimeout(aiTimer);
+        const text = descInput.value.trim();
+        if (text.length < 8) {
+          suggestBox.style.display = 'none';
+          return;
+        }
+        aiTimer = setTimeout(async () => {
+          try {
+            const res = await CivicApi.analyzeAi({
+              description: text,
+              category: this.selectedCategory,
+              latitude: this.latitude,
+              longitude: this.longitude,
+              address: this.address
+            });
+            if (res.success && res.data && res.data.confidenceScore >= 0.70 && res.data.predictedCategory !== 'OTHER') {
+              const cat = res.data.predictedCategory;
+              const catLabel = res.data.predictedCategoryDisplayName || cat;
+              suggestBox.style.display = 'block';
+              suggestBox.innerHTML = `
+                <div class="ai-suggestion-pill" onclick="App.applySuggestedCategory('${cat}')">
+                  <span>🤖 AI Suggestion:</span> <b>${this.escapeHtml(catLabel)}</b> (${(res.data.confidenceScore * 100).toFixed(0)}%)
+                  <span style="text-decoration: underline; font-size:0.75rem; margin-left:0.25rem;">(Click to apply)</span>
+                </div>
+              `;
+            } else {
+              suggestBox.style.display = 'none';
+            }
+          } catch (e) {
+            suggestBox.style.display = 'none';
+          }
+        }, 400);
+      });
+    }
+
     // Final Submit Button
     const submitBtn = document.getElementById('btn-submit-report');
     if (submitBtn) {
@@ -180,9 +221,23 @@ const App = {
     }
   },
 
+  applySuggestedCategory(cat) {
+    this.selectedCategory = cat;
+    document.querySelectorAll('.category-tile').forEach(tile => {
+      tile.classList.toggle('selected', tile.getAttribute('data-category') === cat);
+    });
+    const suggestBox = document.getElementById('ai-smart-suggest-box');
+    if (suggestBox) {
+      suggestBox.innerHTML = `<span style="font-size:0.8rem; color:var(--success); font-weight:600;">✓ Category updated to ${cat}</span>`;
+      setTimeout(() => { suggestBox.style.display = 'none'; }, 2000);
+    }
+  },
+
   resetWizard() {
     this.goToStep(1);
     this.selectedPhotoFile = null;
+    const suggestBox = document.getElementById('ai-smart-suggest-box');
+    if (suggestBox) suggestBox.style.display = 'none';
     this.photoDataUrl = null;
     this.latitude = null;
     this.longitude = null;
@@ -478,7 +533,10 @@ const App = {
       <div class="complaint-card" onclick="App.trackComplaint('${c.trackingNumber}')">
         <div class="complaint-card-header">
           <span style="font-family: monospace; font-weight: 700; font-size: 0.95rem; color: var(--primary);">${c.trackingNumber}</span>
-          ${this.getStatusBadgeHtml(c.status)}
+          <div style="display:flex; align-items:center; gap:0.4rem;">
+            ${this.getPriorityBadgeHtml(c.priority, c.priorityLabel)}
+            ${this.getStatusBadgeHtml(c.status)}
+          </div>
         </div>
         <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem;">${this.escapeHtml(c.title || c.category)}</h3>
         <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.75rem;">📍 ${this.escapeHtml(c.address || 'Location provided')}</p>
@@ -504,7 +562,8 @@ const App = {
     ];
 
     const order = ['REPORTED', 'AI_CLASSIFIED', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED'];
-    const currentIndex = order.indexOf(status);
+    let currentIndex = order.indexOf(status);
+    if (status === 'REJECTED') currentIndex = -1;
 
     return `
       <div class="status-stepper">
@@ -537,6 +596,17 @@ const App = {
     return `<span class="badge ${b.cls}">${b.text}</span>`;
   },
 
+  getPriorityBadgeHtml(priority, label) {
+    if (!priority) return '';
+    const p = String(priority).toUpperCase();
+    const lbl = label || priority;
+    let cls = 'badge-priority-medium';
+    if (p === 'CRITICAL') cls = 'badge-priority-critical';
+    else if (p === 'HIGH') cls = 'badge-priority-high';
+    else if (p === 'LOW') cls = 'badge-priority-low';
+    return `<span class="badge-priority ${cls}">${this.escapeHtml(lbl)}</span>`;
+  },
+
   renderComplaintDetailsModal(issue, isAdmin = false) {
     this.selectedAdminIssue = issue;
 
@@ -557,17 +627,36 @@ const App = {
       photoBox.style.display = 'none';
     }
 
-    // AI Classification (Plain Language for Citizen, Detailed for Admin)
+    // AI Classification & Triage (Clean & Minimal)
     const aiBox = document.getElementById('modal-ai-box');
+    const priorityHtml = this.getPriorityBadgeHtml(issue.priority, issue.priorityLabel);
+    const etaText = issue.estimatedResolutionHours ? `⏱️ Est. SLA: <b>~${issue.estimatedResolutionHours} hrs</b>` : '';
+    const dupNotice = issue.isDuplicate ? `<div style="margin-top:0.4rem; color:#92400e; font-size:0.85rem; background:#fef3c7; padding:0.4rem 0.6rem; border-radius:var(--radius-sm); border:1px solid #fde68a;">⚠️ <b>Duplicate Detected:</b> Matched with active ticket <code>${this.escapeHtml(issue.duplicateOfTrackingNumber || '')}</code></div>` : '';
+
     if (isAdmin) {
       aiBox.style.display = 'block';
       aiBox.innerHTML = `
-        <strong>🤖 AI Classification Details:</strong><br>
-        Detected: <b>${issue.aiSuggestedCategory || issue.category}</b> | Confidence: <b>${issue.aiConfidence ? (issue.aiConfidence * 100).toFixed(0) + '%' : 'Verified'}</b>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div><strong>🤖 AI Triage & Risk Assessment:</strong></div>
+          <div style="display:flex; align-items:center; gap:0.4rem;">${priorityHtml} ${issue.urgencyScore ? `<span style="font-size: 0.8rem; font-weight:700; color: var(--text-muted);">(Score: ${issue.urgencyScore}/100)</span>` : ''}</div>
+        </div>
+        <div style="font-size: 0.88rem; line-height: 1.5;">
+          Category: <b>${this.escapeHtml(issue.aiSuggestedCategory || issue.categoryDisplayName || issue.category || 'General')}</b> 
+          ${issue.aiConfidence ? `| Confidence: <b>${(issue.aiConfidence * 100).toFixed(0)}%</b>` : ''}
+          ${etaText ? ` | ${etaText}` : ''}
+        </div>
+        ${dupNotice}
       `;
-    } else if (issue.aiSuggestedCategory) {
+    } else if (issue.aiSuggestedCategory || issue.priority) {
       aiBox.style.display = 'block';
-      aiBox.innerHTML = `<strong>Detected issue:</strong> ${issue.aiSuggestedCategory || issue.category}`;
+      aiBox.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+          <div><strong>🤖 Detected Issue:</strong> ${this.escapeHtml(issue.aiSuggestedCategory || issue.categoryDisplayName || issue.category || '')}</div>
+          <div>${priorityHtml}</div>
+        </div>
+        ${etaText ? `<div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">${etaText}</div>` : ''}
+        ${dupNotice}
+      `;
     } else {
       aiBox.style.display = 'none';
     }
@@ -607,18 +696,18 @@ const App = {
       });
     }
 
-    // Admin Sidebar Tabs
-    document.querySelectorAll('.admin-menu-link[data-admin-tab]').forEach(tab => {
-      tab.addEventListener('click', (e) => {
+    // Admin Tabs
+    document.querySelectorAll('[data-admin-tab]').forEach(tabBtn => {
+      tabBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        document.querySelectorAll('.admin-menu-link').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        const tabName = tab.getAttribute('data-admin-tab');
-        this.switchAdminTab(tabName);
+        document.querySelectorAll('[data-admin-tab]').forEach(b => b.classList.remove('active'));
+        tabBtn.classList.add('active');
+        const tab = tabBtn.getAttribute('data-admin-tab');
+        this.switchAdminTab(tab);
       });
     });
 
-    // Admin Filter Controls
+    // Admin Complaints Filter
     const statusFilter = document.getElementById('admin-filter-status');
     const deptFilter = document.getElementById('admin-filter-dept');
     const searchFilter = document.getElementById('admin-filter-search');
@@ -626,7 +715,7 @@ const App = {
     if (statusFilter) statusFilter.addEventListener('change', () => this.loadAdminComplaintsTable());
     if (deptFilter) deptFilter.addEventListener('change', () => this.loadAdminComplaintsTable());
     if (searchFilter) {
-      let timer;
+      let timer = null;
       searchFilter.addEventListener('input', () => {
         clearTimeout(timer);
         timer = setTimeout(() => this.loadAdminComplaintsTable(), 300);
@@ -730,20 +819,14 @@ const App = {
       const res = await CivicApi.getStats();
       if (res.success && res.data) {
         const d = res.data;
-        const totalEl = document.getElementById('adm-stat-total');
-        const newEl = document.getElementById('adm-stat-new');
-        const revEl = document.getElementById('adm-stat-review');
-        const progEl = document.getElementById('adm-stat-progress');
-        const resEl = document.getElementById('adm-stat-resolved');
-
-        if (totalEl) totalEl.textContent = d.totalIssues;
-        if (newEl) newEl.textContent = d.reportedIssues;
-        if (revEl) revEl.textContent = d.aiClassifiedIssues;
-        if (progEl) progEl.textContent = d.inProgressIssues;
-        if (resEl) resEl.textContent = d.resolvedIssues;
+        document.getElementById('adm-stat-total').textContent = d.totalComplaints || 0;
+        document.getElementById('adm-stat-new').textContent = d.newComplaints || 0;
+        document.getElementById('adm-stat-review').textContent = d.underReviewComplaints || 0;
+        document.getElementById('adm-stat-progress').textContent = d.inProgressComplaints || 0;
+        document.getElementById('adm-stat-resolved').textContent = d.resolvedComplaints || 0;
       }
     } catch (err) {
-      console.error('Stats load failed:', err);
+      console.warn('Failed to load admin stats', err);
     }
   },
 
@@ -777,7 +860,13 @@ const App = {
     tbody.innerHTML = issues.map(i => `
       <tr>
         <td style="font-family: monospace; font-weight: 700; color: var(--primary);">${this.escapeHtml(i.trackingNumber)}</td>
-        <td><b>${this.escapeHtml(i.title || i.category)}</b></td>
+        <td>
+          <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
+            <b>${this.escapeHtml(i.title || i.category)}</b>
+            ${this.getPriorityBadgeHtml(i.priority, i.priorityLabel)}
+            ${i.isDuplicate ? '<span class="badge-duplicate">🔁 Dup</span>' : ''}
+          </div>
+        </td>
         <td>${this.escapeHtml(i.address || 'Location provided')}</td>
         <td>${i.assignedDepartmentName ? this.escapeHtml(i.assignedDepartmentName) : '<span style="color:var(--text-light)">Unassigned</span>'}</td>
         <td>${this.getStatusBadgeHtml(i.status)}</td>

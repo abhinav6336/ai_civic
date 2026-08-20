@@ -1,5 +1,7 @@
 package com.civic.reporting.service.impl;
 
+import com.civic.reporting.ai.AiAnalysisResult;
+import com.civic.reporting.ai.CivicAiEngine;
 import com.civic.reporting.dto.request.IssueAssignRequest;
 import com.civic.reporting.dto.request.IssueCreateRequest;
 import com.civic.reporting.dto.request.IssueStatusUpdateRequest;
@@ -40,19 +42,22 @@ public class IssueServiceImpl implements IssueService {
     private final UserRepository userRepository;
     private final UserService userService;
     private final FileStorageService fileStorageService;
+    private final CivicAiEngine aiEngine;
 
     public IssueServiceImpl(IssueRepository issueRepository,
                             IssueUpdateRepository issueUpdateRepository,
                             DepartmentRepository departmentRepository,
                             UserRepository userRepository,
                             UserService userService,
-                            FileStorageService fileStorageService) {
+                            FileStorageService fileStorageService,
+                            CivicAiEngine aiEngine) {
         this.issueRepository = issueRepository;
         this.issueUpdateRepository = issueUpdateRepository;
         this.departmentRepository = departmentRepository;
         this.userRepository = userRepository;
         this.userService = userService;
         this.fileStorageService = fileStorageService;
+        this.aiEngine = aiEngine;
     }
 
     @Override
@@ -79,16 +84,43 @@ public class IssueServiceImpl implements IssueService {
                 ? request.getDescription().trim()
                 : "Civic issue reported for " + category.getDisplayName() + (request.getAddress() != null ? " at " + request.getAddress() : ".");
 
+        // 1. Execute AI Pipeline (NLP classification, hazard urgency, duplicate check, ETA prediction)
+        AiAnalysisResult aiResult = aiEngine.analyze(
+                title,
+                description,
+                request.getLatitude(),
+                request.getLongitude(),
+                request.getAddress(),
+                category,
+                null,
+                imageFile
+        );
+
+        // Auto-assign category if citizen selected OTHER and AI is confident
+        IssueCategory finalCategory = category;
+        if ((category == IssueCategory.OTHER || category == null) && aiResult.getPredictedCategory() != null && aiResult.getPredictedCategory() != IssueCategory.OTHER) {
+            finalCategory = aiResult.getPredictedCategory();
+        }
+
         Issue issue = new Issue();
         issue.setTrackingNumber(generateTrackingNumber());
         issue.setTitle(title);
         issue.setDescription(description);
-        issue.setCategory(category);
+        issue.setCategory(finalCategory);
         issue.setStatus(IssueStatus.REPORTED);
         issue.setLatitude(request.getLatitude());
         issue.setLongitude(request.getLongitude());
         issue.setAddress(request.getAddress());
         issue.setCitizen(citizen);
+
+        // Populate AI fields
+        issue.setAiConfidence(aiResult.getConfidenceScore());
+        issue.setAiSuggestedCategory(aiResult.getPredictedCategory() != null ? aiResult.getPredictedCategory().name() : null);
+        issue.setPriority(aiResult.getPriority());
+        issue.setUrgencyScore(aiResult.getUrgencyScore());
+        issue.setEstimatedResolutionHours(aiResult.getEstimatedResolutionHours());
+        issue.setIsDuplicate(aiResult.isDuplicate());
+        issue.setDuplicateOfTrackingNumber(aiResult.getDuplicateOfTrackingNumber());
 
         // Handle image file storage
         if (imageFile != null && !imageFile.isEmpty()) {
@@ -110,6 +142,9 @@ public class IssueServiceImpl implements IssueService {
 
         Issue savedIssue = issueRepository.save(issue);
 
+        // Save AI classification audit record
+        aiEngine.recordClassification(savedIssue, aiResult);
+
         // Record initial submission update log
         IssueUpdate initialUpdate = new IssueUpdate(
                 savedIssue,
@@ -120,6 +155,17 @@ public class IssueServiceImpl implements IssueService {
                 "Issue reported by citizen via web portal."
         );
         issueUpdateRepository.save(initialUpdate);
+
+        // Record AI triage update log
+        IssueUpdate aiUpdate = new IssueUpdate(
+                savedIssue,
+                null,
+                IssueStatus.REPORTED,
+                IssueStatus.AI_CLASSIFIED,
+                "AI_TRIAGE",
+                aiResult.getRationale()
+        );
+        issueUpdateRepository.save(aiUpdate);
 
         return IssueResponse.fromEntity(savedIssue, true);
     }

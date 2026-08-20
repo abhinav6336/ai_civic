@@ -67,6 +67,22 @@ public class Issue {
     @Column(name = "ai_suggested_category", length = 50)
     private String aiSuggestedCategory;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "priority", length = 20)
+    private com.civic.reporting.enums.IssuePriority priority = com.civic.reporting.enums.IssuePriority.MEDIUM;
+
+    @Column(name = "urgency_score")
+    private Integer urgencyScore;
+
+    @Column(name = "estimated_resolution_hours")
+    private Integer estimatedResolutionHours;
+
+    @Column(name = "is_duplicate")
+    private Boolean isDuplicate = false;
+
+    @Column(name = "duplicate_of_tracking_no", length = 64)
+    private String duplicateOfTrackingNumber;
+
     @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("createdAt DESC")
     private List<IssueUpdate> updates = new ArrayList<>();
@@ -215,6 +231,46 @@ public class Issue {
 
     public void setAiSuggestedCategory(String aiSuggestedCategory) {
         this.aiSuggestedCategory = aiSuggestedCategory;
+    }
+
+    public com.civic.reporting.enums.IssuePriority getPriority() {
+        return priority;
+    }
+
+    public void setPriority(com.civic.reporting.enums.IssuePriority priority) {
+        this.priority = priority;
+    }
+
+    public Integer getUrgencyScore() {
+        return urgencyScore;
+    }
+
+    public void setUrgencyScore(Integer urgencyScore) {
+        this.urgencyScore = urgencyScore;
+    }
+
+    public Integer getEstimatedResolutionHours() {
+        return estimatedResolutionHours;
+    }
+
+    public void setEstimatedResolutionHours(Integer estimatedResolutionHours) {
+        this.estimatedResolutionHours = estimatedResolutionHours;
+    }
+
+    public Boolean getIsDuplicate() {
+        return isDuplicate;
+    }
+
+    public void setIsDuplicate(Boolean isDuplicate) {
+        this.isDuplicate = isDuplicate;
+    }
+
+    public String getDuplicateOfTrackingNumber() {
+        return duplicateOfTrackingNumber;
+    }
+
+    public void setDuplicateOfTrackingNumber(String duplicateOfTrackingNumber) {
+        this.duplicateOfTrackingNumber = duplicateOfTrackingNumber;
     }
 
     public List<IssueUpdate> getUpdates() {

@@ -157,6 +157,26 @@ const CivicApi = {
     return await res.json();
   },
 
+  // Real-time AI Text Triage & Suggestion
+  async analyzeAi(payload) {
+    const res = await fetch(`${API_BASE}/ai/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw await this.extractError(res);
+    return await res.json();
+  },
+
+  // Issue AI Diagnostics
+  async getIssueAiDiagnostics(issueId) {
+    const res = await fetch(`${API_BASE}/ai/diagnostics/${issueId}`, {
+      headers: this.getAuthHeaders()
+    });
+    if (!res.ok) throw await this.extractError(res);
+    return await res.json();
+  },
+
   async extractError(res) {
     try {
       const json = await res.json();

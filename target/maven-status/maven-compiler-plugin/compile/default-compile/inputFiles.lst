@@ -1,50 +1,61 @@
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/CivicReportingApplication.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/config/CorsConfig.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/config/DataInitializer.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/controller/AuthController.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/controller/DashboardStatsController.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/controller/DepartmentController.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/controller/IssueController.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/controller/UserController.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/dto/request/IssueAssignRequest.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/dto/request/IssueCreateRequest.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/dto/request/IssueStatusUpdateRequest.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/dto/request/LoginRequest.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/dto/request/UserCreateRequest.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/dto/response/ApiResponse.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/dto/response/AuthResponse.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/dto/response/CivicInsightsResponse.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/dto/response/DashboardStatsResponse.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/dto/response/DepartmentResponse.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/dto/response/IssueResponse.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/dto/response/IssueUpdateResponse.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/dto/response/UserResponse.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/entity/AIClassification.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/entity/Department.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/entity/Issue.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/entity/IssueUpdate.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/entity/User.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/enums/IssueCategory.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/enums/IssueStatus.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/enums/UserRole.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/exception/BadRequestException.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/exception/ErrorResponse.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/exception/GlobalExceptionHandler.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/exception/ResourceNotFoundException.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/repository/AIClassificationRepository.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/repository/DepartmentRepository.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/repository/IssueRepository.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/repository/IssueUpdateRepository.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/repository/UserRepository.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/service/CivicInsightsService.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/service/DashboardService.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/service/DepartmentService.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/service/FileStorageService.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/service/IssueService.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/service/UserService.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/service/impl/CivicInsightsServiceImpl.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/service/impl/DashboardServiceImpl.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/service/impl/DepartmentServiceImpl.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/service/impl/FileStorageServiceImpl.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/service/impl/IssueServiceImpl.java
-/home/ubuntu/ai civic /civic-reporting/src/main/java/com/civic/reporting/service/impl/UserServiceImpl.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/CivicReportingApplication.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/ai/AiAnalysisResult.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/ai/CivicAiEngine.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/ai/DuplicateDetectionEngine.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/ai/ImageQualityValidator.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/ai/NlpTextClassifier.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/ai/ResolutionPredictor.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/ai/UrgencyRiskModel.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/config/CorsConfig.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/config/DataInitializer.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/controller/AiController.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/controller/AuthController.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/controller/DashboardStatsController.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/controller/DepartmentController.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/controller/IssueController.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/controller/UserController.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/dto/request/AiAnalysisRequest.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/dto/request/IssueAssignRequest.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/dto/request/IssueCreateRequest.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/dto/request/IssueStatusUpdateRequest.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/dto/request/LoginRequest.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/dto/request/UserCreateRequest.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/dto/response/AiAnalysisResponse.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/dto/response/ApiResponse.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/dto/response/AuthResponse.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/dto/response/CivicInsightsResponse.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/dto/response/DashboardStatsResponse.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/dto/response/DepartmentResponse.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/dto/response/IssueResponse.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/dto/response/IssueUpdateResponse.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/dto/response/UserResponse.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/entity/AIClassification.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/entity/Department.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/entity/Issue.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/entity/IssueUpdate.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/entity/User.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/enums/IssueCategory.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/enums/IssuePriority.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/enums/IssueStatus.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/enums/UserRole.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/exception/BadRequestException.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/exception/ErrorResponse.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/exception/GlobalExceptionHandler.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/exception/ResourceNotFoundException.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/repository/AIClassificationRepository.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/repository/DepartmentRepository.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/repository/IssueRepository.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/repository/IssueUpdateRepository.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/repository/UserRepository.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/service/CivicInsightsService.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/service/DashboardService.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/service/DepartmentService.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/service/FileStorageService.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/service/IssueService.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/service/UserService.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/service/impl/CivicInsightsServiceImpl.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/service/impl/DashboardServiceImpl.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/service/impl/DepartmentServiceImpl.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/service/impl/FileStorageServiceImpl.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/service/impl/IssueServiceImpl.java
+/home/abhinav/ai_civic/src/main/java/com/civic/reporting/service/impl/UserServiceImpl.java

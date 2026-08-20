@@ -43,7 +43,11 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
 
     long countByStatus(IssueStatus status);
 
+    long countByStatusNot(IssueStatus status);
+
     long countByCategory(IssueCategory category);
 
     long countByAssignedDepartmentId(Long departmentId);
+
+    long countByAssignedDepartmentIdAndStatusNot(Long departmentId, IssueStatus status);
 }

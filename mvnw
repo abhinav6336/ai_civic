@@ -1,7 +1,12 @@
 #!/bin/sh
-# Maven wrapper wrapper script for local environment
-DIR="$(cd "$(dirname "$0")" && pwd)"
-export JAVA_HOME="${DIR}/../.tools/jdk-21.0.2+13"
-export PATH="${JAVA_HOME}/bin:${DIR}/../.tools/apache-maven-3.9.6/bin:${PATH}"
+# Maven executable script for civic-reporting
+MVN_BIN="/home/abhinav/.m2/wrapper/dists/apache-maven-3.6.3-bin/1iopthnavndlasol9gbrbg6bf2/apache-maven-3.6.3/bin/mvn"
 
-exec "${DIR}/../.tools/apache-maven-3.9.6/bin/mvn" "$@"
+if [ -x "$MVN_BIN" ]; then
+    exec "$MVN_BIN" "$@"
+elif command -v mvn >/dev/null 2>&1; then
+    exec mvn "$@"
+else
+    echo "Error: Maven not found." >&2
+    exit 1
+fi

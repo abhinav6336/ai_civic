@@ -636,6 +636,56 @@ textarea.form-input {
 .badge-resolved { background: #dcfce7; color: #15803d; }
 .badge-rejected { background: #fee2e2; color: #b91c1c; }
 
+/* AI Priority Badges */
+.badge-priority {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.badge-priority-critical { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+.badge-priority-high { background: #ffedd5; color: #ea580c; border: 1px solid #fdba74; }
+.badge-priority-medium { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+.badge-priority-low { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
+
+.badge-duplicate {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid #fde68a;
+}
+
+.ai-suggestion-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  margin-top: 0.5rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.ai-suggestion-pill:hover {
+  background: #dcfce7;
+  border-color: #86efac;
+}
+
 /* ==============================================================================
    4. ADMIN DASHBOARD & LAYOUT
    ============================================================================== */

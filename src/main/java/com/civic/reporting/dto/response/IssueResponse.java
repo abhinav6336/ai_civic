@@ -36,6 +36,14 @@ public class IssueResponse {
     private Double aiConfidence;
     private String aiSuggestedCategory;
 
+    private com.civic.reporting.enums.IssuePriority priority;
+    private String priorityLabel;
+    private String priorityColor;
+    private Integer urgencyScore;
+    private Integer estimatedResolutionHours;
+    private Boolean isDuplicate;
+    private String duplicateOfTrackingNumber;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -79,6 +87,13 @@ public class IssueResponse {
 
         res.setAiConfidence(issue.getAiConfidence());
         res.setAiSuggestedCategory(issue.getAiSuggestedCategory());
+        res.setPriority(issue.getPriority());
+        res.setPriorityLabel(issue.getPriority() != null ? issue.getPriority().getLabel() : null);
+        res.setPriorityColor(issue.getPriority() != null ? issue.getPriority().getColor() : null);
+        res.setUrgencyScore(issue.getUrgencyScore());
+        res.setEstimatedResolutionHours(issue.getEstimatedResolutionHours());
+        res.setIsDuplicate(issue.getIsDuplicate());
+        res.setDuplicateOfTrackingNumber(issue.getDuplicateOfTrackingNumber());
         res.setCreatedAt(issue.getCreatedAt());
         res.setUpdatedAt(issue.getUpdatedAt());
 
@@ -272,6 +287,62 @@ public class IssueResponse {
 
     public void setAiSuggestedCategory(String aiSuggestedCategory) {
         this.aiSuggestedCategory = aiSuggestedCategory;
+    }
+
+    public com.civic.reporting.enums.IssuePriority getPriority() {
+        return priority;
+    }
+
+    public void setPriority(com.civic.reporting.enums.IssuePriority priority) {
+        this.priority = priority;
+    }
+
+    public String getPriorityLabel() {
+        return priorityLabel;
+    }
+
+    public void setPriorityLabel(String priorityLabel) {
+        this.priorityLabel = priorityLabel;
+    }
+
+    public String getPriorityColor() {
+        return priorityColor;
+    }
+
+    public void setPriorityColor(String priorityColor) {
+        this.priorityColor = priorityColor;
+    }
+
+    public Integer getUrgencyScore() {
+        return urgencyScore;
+    }
+
+    public void setUrgencyScore(Integer urgencyScore) {
+        this.urgencyScore = urgencyScore;
+    }
+
+    public Integer getEstimatedResolutionHours() {
+        return estimatedResolutionHours;
+    }
+
+    public void setEstimatedResolutionHours(Integer estimatedResolutionHours) {
+        this.estimatedResolutionHours = estimatedResolutionHours;
+    }
+
+    public Boolean getIsDuplicate() {
+        return isDuplicate;
+    }
+
+    public void setIsDuplicate(Boolean isDuplicate) {
+        this.isDuplicate = isDuplicate;
+    }
+
+    public String getDuplicateOfTrackingNumber() {
+        return duplicateOfTrackingNumber;
+    }
+
+    public void setDuplicateOfTrackingNumber(String duplicateOfTrackingNumber) {
+        this.duplicateOfTrackingNumber = duplicateOfTrackingNumber;
     }
 
     public LocalDateTime getCreatedAt() {
